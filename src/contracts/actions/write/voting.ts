@@ -4,6 +4,9 @@ import { ArditAction, ArditState, ContractResult } from "../../types/types";
 
 declare const ContractError;
 
+// takes in the current state and action inputs
+// passed in through handler function based off SmartWeave standard
+// returns result of type Contract Result
 export const upvoteMessage = async (
   state: ArditState,
   { caller, input: { id } }: ArditAction
