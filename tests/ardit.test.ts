@@ -26,4 +26,34 @@ describe('Testing the Atomic NFT Token', () => {
 
   let contractSrc: string;
   let contractId: string;
+
+  beforeAll(async () => {
+    arlocal = new ArLocal(1820, false);
+    await arlocal.start();
+
+    LoggerFactory.INST.logLevel('error');
+    //LoggerFactory.INST.logLevel('debug', 'WasmContractHandlerApi');
+
+    warp = WarpFactory.forLocal(1820);
+
+    ({ jwk: ownerWallet, address: owner } = await warp.generateWallet());
+
+    ({ jwk: user2Wallet, address: user2 } = await warp.generateWallet());
+
+    ({ jwk: user3Wallet, address: user3 } = await warp.generateWallet());
+
+    initialState = {
+      messages: [],
+    };
+
+    contractSrc = fs.readFileSync(path.join(__dirname, '../dist/contract.js'), 'utf8');
+
+    ({ contractTxId: contractId } = await warp.createContract.deploy({
+      wallet: ownerWallet,
+      initState: JSON.stringify(initialState),
+      src: contractSrc,
+    }));
+    console.log('Deployed contract: ', contractId);
+    ardit = warp.contract<ArditState>(contractId).connect(ownerWallet);
+  });
 });
